@@ -6,7 +6,7 @@ import api from "../services/api";
 import { Calendar, Mail, Phone, User, Shield, LogOut } from "lucide-react";
 
 const Dashboard: React.FC = () => {
-  const { user, loading: authLoading, isAuthenticated, logout } = useAuth();
+  const { loading: authLoading, isAuthenticated, logout } = useAuth();
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [profileData, setProfileData] = useState<any>(null);
 
