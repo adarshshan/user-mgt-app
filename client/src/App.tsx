@@ -1,9 +1,9 @@
-import React from "react";
 import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
+  createBrowserRouter,
+  RouterProvider,
+  Outlet, // Import Outlet for layout rendering
   Navigate,
+  useLocation, // Keep useLocation for conditional Navbar rendering
 } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
@@ -19,44 +19,77 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 
 const Home = () => {
   const { isAuthenticated } = useAuth();
-  // If authenticated, redirect to dashboard, otherwise to login.
-  // This prevents authenticated users from seeing the login page when they visit the root URL.
   return isAuthenticated ? <Navigate to="/dashboard" /> : <Login />;
 };
 
-const App: React.FC = () => {
+// Define a Layout component for conditional Navbar rendering
+const Layout: React.FC = () => {
+  const location = useLocation();
+  const noNavbarPaths = ["/login", "/register", "/"]; // Added '/' to hide Navbar on initial load
+  const shouldShowNavbar = !noNavbarPaths.includes(location.pathname);
+
   return (
-    <Router>
+    <>
       <Toaster position="top-right" reverseOrder={false} />
       <AuthProvider>
-        <Navbar />
-        <Routes>
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/verify-email" element={<VerifyEmail />} />
-          <Route path="/verify-otp" element={<VerifyOTP />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <EditProfile />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/" element={<Home />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        {shouldShowNavbar && <Navbar />}
+        <Outlet /> {/* Renders the current route's component */}
       </AuthProvider>
-    </Router>
+    </>
   );
+};
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Layout />, // Use the Layout component for all routes
+    children: [
+      {
+        index: true, // This makes Home the default route for "/"
+        element: <Home />,
+      },
+      {
+        path: "register",
+        element: <Register />,
+      },
+      {
+        path: "login",
+        element: <Login />,
+      },
+      {
+        path: "verify-email",
+        element: <VerifyEmail />,
+      },
+      {
+        path: "verify-otp",
+        element: <VerifyOTP />,
+      },
+      {
+        path: "dashboard",
+        element: (
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "profile",
+        element: (
+          <ProtectedRoute>
+            <EditProfile />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "*", // Catch-all for 404
+        element: <NotFound />,
+      },
+    ],
+  },
+]);
+
+const App: React.FC = () => {
+  return <RouterProvider router={router} />;
 };
 
 export default App;

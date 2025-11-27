@@ -20,9 +20,8 @@ mongoose
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-// --- Core Middlewares ---
-app.use(helmet()); // Secure HTTP headers
-app.use(express.json()); // Body parser for JSON
+app.use(helmet());
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
@@ -40,13 +39,13 @@ app.use(
     secret: config.session.secret,
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: config.mongoUri }), // RESTORE THIS LINE
+    store: MongoStore.create({ mongoUrl: config.mongoUri }),
     cookie: {
       maxAge: 24 * 60 * 60 * 1000,
-      httpOnly: true, // Prevent client-side JS from accessing the cookie
-      secure: process.env.NODE_ENV === "production", // true only in prod
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // ← THIS IS KEY
-      domain: "localhost", // Explicitly set domain for localhost development
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      domain: "localhost",
     },
   })
 );
@@ -62,34 +61,20 @@ const {
   storeTokenInState: (req, token) => {
     req.session.csrfToken = token;
   },
-  // Expect token in the 'X-CSRF-Token' header by default
 });
 
-// 3. Middleware to generate a token for GET requests and expose an endpoint
 app.use((req, res, next) => {
-  // Generate a token if one doesn't exist for the session
   if (!req.session.csrfToken) {
     storeTokenInState(req, generateToken(req));
   }
   next();
 });
 
-// 4. Apply CSRF protection to all routes after this point
-
-app.get("/save-session", (req, res) => {
-  req.session.checking = "adarsh shanu";
-  res.send("session stored" + " " + req.session.checking);
-});
-app.get("/check-working", (req, res) => {
-  if (req.session.checking) res.send(req.session.checking);
-  else res.send("session not stored");
-});
-
-// Route to send the token to the client
 app.get("/api/csrf-token", (req, res) => {
-  // Send the token value which is stored in the session
   res.json({ csrfToken: req.session.csrfToken });
 });
+
+app.use(csrfSynchronisedProtection);
 
 app.get("/", (req, res) => {
   res.send("server is running...");
@@ -97,11 +82,9 @@ app.get("/", (req, res) => {
 
 // --- API Routes ---
 app.use("/api/auth", authRoutes);
-app.use(csrfSynchronisedProtection);
 app.use("/api/users", userRoutes);
 
 // --- Global Error Handler ---
-// This must be the last middleware
 app.use(errorHandler);
 
 // --- Start Server ---

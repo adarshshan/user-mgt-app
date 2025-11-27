@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { useForm, FormProvider } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
-import Input from '../components/Input';
-import api from '../services/api';
-import { toast } from 'react-hot-toast';
-import useAuth from '../hooks/useAuth';
-import Spinner from '../components/Spinner';
+import React, { useEffect, useState } from "react";
+import { useForm, FormProvider } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import Input from "../components/Input";
+import api from "../services/api";
+import { toast } from "react-hot-toast";
+import useAuth from "../hooks/useAuth";
+import Spinner from "../components/Spinner";
 
 interface EditProfileFormData {
   name: string;
@@ -22,41 +22,43 @@ const EditProfile: React.FC = () => {
 
   useEffect(() => {
     const fetchProfile = async () => {
-        setLoadingProfile(true);
-        try {
-            const res = await api.get('/users/profile');
-            if (res.data.success) {
-                const profile = res.data.data;
-                reset({
-                    name: profile.name,
-                    phone: profile.phone,
-                    dob: profile.dob,
-                });
-            }
-        } catch (error: any) {
-            toast.error(error.response?.data?.message || 'Failed to fetch profile for editing.');
-            navigate('/dashboard'); // Redirect if profile can't be fetched
-        } finally {
-            setLoadingProfile(false);
+      setLoadingProfile(true);
+      try {
+        const res = await api.get("/users/profile");
+        if (res.data.success) {
+          const profile = res.data.data;
+          reset({
+            name: profile.name,
+            phone: profile.phone,
+            dob: profile.dob,
+          });
         }
+      } catch (error: any) {
+        toast.error(
+          error.response?.data?.message ||
+            "Failed to fetch profile for editing."
+        );
+        navigate("/dashboard"); // Redirect if profile can't be fetched
+      } finally {
+        setLoadingProfile(false);
+      }
     };
 
     if (!authLoading && user) {
       fetchProfile();
     } else if (!authLoading && !user) {
-        navigate('/login'); // Redirect to login if not authenticated
+      navigate("/login"); // Redirect to login if not authenticated
     }
   }, [authLoading, user, reset, navigate]);
 
-
   const onSubmit = async (data: EditProfileFormData) => {
     try {
-      const res = await api.put('/users/profile', data);
+      const res = await api.put("/users/profile", data);
       toast.success(res.data.message);
-      setUser(prevUser => (prevUser ? { ...prevUser, ...data } : null)); // Update local user state
-      navigate('/dashboard'); // Redirect to dashboard after update
+      setUser((prevUser) => (prevUser ? { ...prevUser, ...data } : null)); // Update local user state
+      navigate("/dashboard"); // Redirect to dashboard after update
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Profile update failed.');
+      toast.error(error.response?.data?.message || "Profile update failed.");
     }
   };
 
@@ -69,7 +71,7 @@ const EditProfile: React.FC = () => {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+    <div className="flex justify-center items-center min-h-[92vh] bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold text-center mb-6">Edit Profile</h2>
         <FormProvider {...methods}>
