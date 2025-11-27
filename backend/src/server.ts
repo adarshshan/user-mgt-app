@@ -29,17 +29,18 @@ app.use(
   cors({
     origin: (origin, callback) => {
       if (!origin) return callback(null, true);
-      const allowedOrigins = ["*"];
-      if (
-        process.env.NODE_ENV === "production" &&
-        config.frontendUrl &&
-        new URL(config.frontendUrl).origin === origin
-      )
-        return callback(null, true);
+      const allowedOrigins = [
+        config.frontendUrl, // From .env
+        'http://localhost:5173', // Explicitly allow common development port
+        'http://localhost:3000', // Another common development port
+      ];
+
+      if (process.env.NODE_ENV === "production" && config.frontendUrl && new URL(config.frontendUrl).origin === origin) {
+         return callback(null, true);
+      }
 
       if (allowedOrigins.indexOf(origin) === -1) {
-        const msg =
-          "The CORS policy for this site does not allow access from the specified Origin.";
+        const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
         return callback(new Error(msg), false);
       }
       return callback(null, true);
@@ -89,7 +90,11 @@ app.get("/api/csrf-token", (req, res) => {
   res.json({ csrfToken: req.session.csrfToken });
 });
 
-app.use(csrfSynchronisedProtection);
+app.get("/api/test", (req, res) => {
+  res.send("API test successful!");
+});
+
+// app.use(csrfSynchronisedProtection);
 
 app.get("/", (req, res) => {
   res.send("server is running... new change...");
