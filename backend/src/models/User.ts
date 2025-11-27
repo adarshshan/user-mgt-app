@@ -1,16 +1,13 @@
-import mongoose, { Schema, Document } from 'mongoose';
-import bcrypt from 'bcrypt';
-import { encrypt, decrypt } from '../utils/crypto';
-
-// Note: In a real production app, consider the implications of storing
-// and encrypting PII data carefully and follow compliance regulations.
+import mongoose, { Schema, Document } from "mongoose";
+import bcrypt from "bcrypt";
+import { encrypt, decrypt } from "../utils/crypto";
 
 export interface IUser extends Document {
   name: string;
   email: string;
-  password?: string; // Optional because it will be removed from response objects
+  password?: string;
   phone: string;
-  dob: string; // Storing as encrypted string
+  dob: string;
   emailVerified: boolean;
   emailVerificationToken?: string;
   otp?: string;
@@ -45,8 +42,8 @@ const UserSchema: Schema<IUser> = new Schema(
 );
 
 // Pre-save hook to hash password before saving
-UserSchema.pre<IUser>('save', async function (next) {
-  if (!this.isModified('password') || !this.password) {
+UserSchema.pre<IUser>("save", async function (next) {
+  if (!this.isModified("password") || !this.password) {
     return next();
   }
   try {
@@ -68,6 +65,6 @@ UserSchema.methods.comparePassword = async function (
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-const User = mongoose.model<IUser>('User', UserSchema);
+const User = mongoose.model<IUser>("User", UserSchema);
 
 export default User;

@@ -20,12 +20,10 @@ const transporter = nodemailer.createTransport({
 export const sendEmail = async (mailOptions: MailOptions) => {
   try {
     await transporter.sendMail({
-      // from: `"${config.email.from}" <${config.email.user}>`,
       ...mailOptions,
     });
   } catch (error) {
     console.error("Error sending email:", error);
-    // In a real app, you'd want more robust error handling/logging
     throw new Error("Could not send email.");
   }
 };

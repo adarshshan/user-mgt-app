@@ -19,9 +19,6 @@ export const registerUserService = async (userData: Partial<IUser>) => {
   // Generate email verification token
   const emailVerificationToken = crypto.randomBytes(32).toString("hex");
 
-  console.log("saved in db .... emailVerificationToken");
-  console.log(emailVerificationToken);
-
   const user = new User({
     name,
     email,
@@ -40,11 +37,8 @@ export const registerUserService = async (userData: Partial<IUser>) => {
   };
 };
 
-// --- Email Verification ---
 export const verifyEmailService = async (token: string) => {
   const user = await User.findOne({ emailVerificationToken: token.trim() });
-
-  console.log(user);
 
   if (!user) {
     throw new Error("Invalid verification token.");
@@ -76,15 +70,11 @@ export const loginPasswordStepService = async (
     throw new Error("Please verify your email before logging in.");
   }
 
-  // Generate and save OTP
   const otp = crypto.randomInt(100000, 999999).toString();
-  const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+  const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
 
   user.otp = otp;
-  user.otpExpiry = otpExpiry;
-  await user.save({ validateBeforeSave: false }); // Skip validation to save otp fields
 
-  // Send OTP email
   await sendOtpEmail(user.email, otp);
 
   return { message: "OTP sent to your email.", userId: user._id };
@@ -106,11 +96,9 @@ export const loginOtpStepService = async (userId: string, otp: string) => {
     throw new Error("Invalid or expired OTP.");
   }
 
-  // Clear OTP fields after successful verification
   user.otp = undefined;
   user.otpExpiry = undefined;
   await user.save({ validateBeforeSave: false });
 
-  // Return user for session creation
   return user;
 };

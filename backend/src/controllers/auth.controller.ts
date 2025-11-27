@@ -2,12 +2,11 @@ import { Request, Response } from "express";
 import * as authService from "../services/auth.service";
 import { sendSuccess, sendError } from "../utils/response";
 
-// Extend SessionData to include our custom fields
 declare module "express-session" {
   interface SessionData {
     userId?: string;
     loginStep?: "otp";
-    tempUserId?: string; // To hold user ID between password and OTP steps
+    tempUserId?: string;
     checking?: string;
   }
 }
