@@ -25,25 +25,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// CORS configuration to allow credentials from the frontend
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
-      const allowedOrigins = [
-        config.frontendUrl, // From .env
-        'http://localhost:5173', // Explicitly allow common development port
-        'http://localhost:3000', // Another common development port
-      ];
-
-      // Also allow a deployed frontend if config.frontendUrl is set to a deployed domain
-      if (process.env.NODE_ENV === "production" && config.frontendUrl && new URL(config.frontendUrl).origin === origin) {
-         return callback(null, true);
-      }
+      const allowedOrigins = ["*"];
+      if (
+        process.env.NODE_ENV === "production" &&
+        config.frontendUrl &&
+        new URL(config.frontendUrl).origin === origin
+      )
+        return callback(null, true);
 
       if (allowedOrigins.indexOf(origin) === -1) {
-        const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+        const msg =
+          "The CORS policy for this site does not allow access from the specified Origin.";
         return callback(new Error(msg), false);
       }
       return callback(null, true);
