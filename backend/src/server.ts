@@ -89,7 +89,7 @@ app.get("/api/csrf-token", (req, res) => {
   res.json({ csrfToken: req.session.csrfToken });
 });
 
-app.use(csrfSynchronisedProtection);
+// app.use(csrfSynchronisedProtection);
 
 app.get("/", (req, res) => {
   res.send("server is running...");
