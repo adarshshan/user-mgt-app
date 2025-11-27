@@ -1,6 +1,7 @@
-import React, { createContext, useState, useEffect, ReactNode, useContext } from 'react';
-import api from '../services/api';
-import { toast } from 'react-hot-toast';
+import React, { createContext, useState, useEffect, useContext } from "react";
+import type { ReactNode } from "react";
+import api from "../services/api";
+import { toast } from "react-hot-toast";
 
 interface User {
   _id: string;
@@ -31,7 +32,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const checkAuth = async () => {
     try {
       setLoading(true);
-      const res = await api.get('/users/profile');
+      const res = await api.get("/users/profile");
       if (res.data.success) {
         setUser(res.data.data);
         setIsAuthenticated(true);
@@ -57,17 +58,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     try {
-      await api.post('/auth/logout');
+      await api.post("/auth/logout");
       setUser(null);
       setIsAuthenticated(false);
-      toast.success('Logged out successfully!');
+      toast.success("Logged out successfully!");
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Logout failed.');
+      toast.error(error.response?.data?.message || "Logout failed.");
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, loading, login, logout, checkAuth, setUser }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated,
+        loading,
+        login,
+        logout,
+        checkAuth,
+        setUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -76,7 +87,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

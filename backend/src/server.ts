@@ -91,13 +91,14 @@ app.get("/api/csrf-token", (req, res) => {
   res.json({ csrfToken: req.session.csrfToken });
 });
 
+app.use(csrfSynchronisedProtection);
+
 app.get("/", (req, res) => {
   res.send("server is running...");
 });
 
 // --- API Routes ---
 app.use("/api/auth", authRoutes);
-app.use(csrfSynchronisedProtection);
 app.use("/api/users", userRoutes);
 
 // --- Global Error Handler ---

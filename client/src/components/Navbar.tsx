@@ -1,9 +1,9 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import useAuth from '../hooks/useAuth';
+import React from "react";
+import { Link } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
 
 const Navbar: React.FC = () => {
-  const { isAuthenticated, logout, user } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
 
   return (
     <nav className="bg-gray-800 p-4 text-white">
