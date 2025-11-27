@@ -20,9 +20,8 @@ mongoose
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-// --- Core Middlewares ---
-app.use(helmet()); // Secure HTTP headers
-app.use(express.json()); // Body parser for JSON
+app.use(helmet());
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
@@ -74,20 +73,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// 4. Apply CSRF protection to all routes after this point
-
-app.get("/save-session", (req, res) => {
-  req.session.checking = "adarsh shanu";
-  res.send("session stored" + " " + req.session.checking);
-});
-app.get("/check-working", (req, res) => {
-  if (req.session.checking) res.send(req.session.checking);
-  else res.send("session not stored");
-});
-
-// Route to send the token to the client
 app.get("/api/csrf-token", (req, res) => {
-  // Send the token value which is stored in the session
   res.json({ csrfToken: req.session.csrfToken });
 });
 
@@ -102,7 +88,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 
 // --- Global Error Handler ---
-// This must be the last middleware
 app.use(errorHandler);
 
 // --- Start Server ---
